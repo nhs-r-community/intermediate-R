@@ -1,0 +1,134 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Alternative joins"
+---
+
+## Joining tables without common data (keys)
+
+Standard joins are covered in the [Introduction to R and R Studio course](https://intro-r-rstudio.nhsrcommunity.com/session-joins.html#/title-slide) but it's also possible to use base R to join tables with no keys
+
+First create two different data frames:
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+df_one <- data |>
+  dplyr::select(period, org_code, type, attendances) |>
+  head()
+
+df_two <- data |>
+  dplyr::select(where(is.numeric)) |>
+  head()
+```
+
+## Combine columns
+
+Adding the data side by side in a sense
+
+```{r}
+cbind(df_one, df_two)
+```
+
+:::{.callout-warning collapse=false appearance='default' icon=true}
+Note that the column `attendances` is duplicated (and with the same name) unlike when using dplyr functions which add `.x` and `.y`
+:::
+
+## Combine rows (like SQL)
+
+Where the columns match
+
+```{r}
+
+rbind(df_one, df_two) # fails as they are different
+
+df_top <- data |>
+  head()
+
+df_tail <- data |>
+  tail()
+
+rbind(df_top, df_tail)
+```
+
+## Combining rows (dplyr)
+
+```{r}
+df_one
+df_two
+
+dplyr::bind_rows(df_one, df_two)
+
+df_one |> 
+  dplyr::bind_rows(df_two)
+
+```
+
+## Over to you
+
+- Create a dataframe of the top 5 admissions 
+- and the bottom 5 attendances
+- Join the two dataframes together side by side (as columns)
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+Best to use the `dplyr` package
+:::
+
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 8,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer for joins
+
+```{r}
+df_one <- data |>
+  dplyr::select(admissions) |>
+  dplyr::slice_max(n = 5, order_by = admissions)
+
+df_two <- data |>
+  dplyr::select(attendances) |>
+  dplyr::slice_min(n = 5, order_by = attendances)
+
+dplyr::bind_cols(df_one, df_two)
+
+```
+
+## Managing duplicates
+
+Duplicates can occur with the column or row binding.
+
+To handle this the function `union()` is useful
+
+```{r}
+# going to rename breaches to admissions to create some duplicates
+df <- tibble::tibble(x = c(1, 2, 3))
+
+df2 <- tibble::tibble(x = c(3, 4, 5))
+```
+
+Removes duplicates similar to SQL UNION
+```{r}
+dplyr::union(df, df2)
+```
+
+Whilst this function keeps all data
+
+```{r}
+dplyr::union_all(df, df2)
+```
+
+## End session

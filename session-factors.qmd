@@ -1,0 +1,90 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Factors"
+---
+## Quick note on factors
+
+Factors are a datatype that converts a character into a ordinal datatype.
+Think low medium and high
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data <- data |>
+  dplyr::mutate(
+    attendance_grouping = dplyr::case_when(
+      attendances < 5000 ~ 'Less than 5,000',
+      attendances < 10000 ~ '5,000 to 9,999',
+      attendances < 15000 ~ '10,000 to 14,999',
+      attendances < 20000 ~ '15,000 to 19,999',
+      attendances < 25000 ~ '20,000 to 24,999',
+      attendances >= 25000 ~ '25,000 and over',
+      .default = 'ERROR - does not compute'
+    )
+  )
+```
+
+## Look at our attendance groupings
+
+```{r}
+data_fact <- data |>
+  dplyr::filter(period == '2016-04-01', 
+                type == '1') |>
+  dplyr::arrange(attendance_grouping)
+
+data_fact
+```
+
+
+## Let's do a super quick plot
+
+```{r}
+data_fact |>
+  ggplot2::ggplot(ggplot2::aes(x = attendance_grouping)) +
+  ggplot2::geom_bar()
+
+```
+
+## Character to factor data type
+
+We can then make it ordinal:
+
+```{r}
+data_fact <- data_fact |>
+  dplyr::mutate(
+    attendance_grouping = factor(
+      attendance_grouping,
+      levels = c(
+        "Less than 5,000",
+        "5,000 to 9,999",
+        "10,000 to 14,999",
+        "15,000 to 19,999",
+        "20,000 to 24,999",
+        "25,000 and over"
+      )
+    )
+  )
+
+data_fact
+
+```
+
+## Let's do our plot again
+
+```{r}
+data_fact |>
+  ggplot2::ggplot(ggplot2::aes(x = attendance_grouping)) +
+  ggplot2::geom_bar()
+
+```
+
+:::{.callout-warning collapse=false appearance='default' icon=true}
+If you set your data as factors, R will not like you adding data
+into that column if is not one of the factors you have created.
+
+There are ways of doing this but don't have time now to go into detail
+:::
+
+## End session

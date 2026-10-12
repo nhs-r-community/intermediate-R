@@ -1,0 +1,205 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Conditionals"
+---
+
+## Basic two part conditional `if_else()`
+
+Flag attendances that were above 20,000
+
+using **if** _this_, do _this_ **else** do _that_
+
+```{r}
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::mutate(above_20000 = dplyr::if_else(attendances >= 20000, "Y", "N"))
+```
+
+## Watch out for data types!
+
+:::{.callout-note collapse=false appearance='default' icon=true}
+Data types and outputs for two conditions need to be the same
+:::
+
+This breaks:
+
+```{r}
+data |>
+  dplyr::mutate(above_20000 = dplyr::if_else(attendances >= 20000, 100, "9999"))
+```
+
+## More than one conditional
+
+::: {.incremental}
+- `if_else` is great for a single conditional
+- you can nest `if_else` statements but that gets really messy quickly
+- especially with all the brackets!
+- A multi part conditional to use would be a case statement.
+:::
+
+
+## Using `case_when()`
+
+Let's create a grouping column for our attendances in 5000s
+
+```{r}
+data |>
+  dplyr::mutate(
+    attendance_grouping = dplyr::case_when(
+      attendances < 5000 ~ "Less than 5,000",
+      attendances < 10000 ~ "5,000 to 9,999",
+      attendances < 15000 ~ "10,000 to 14,999",
+      attendances < 20000 ~ "15,000 to 19,999",
+      attendances < 25000 ~ "20,000 to 24,999",
+      .default = "Over 25,0000"
+    )
+  )
+```
+
+## What are `.default` and `~`?
+
+::: {.incremental}
+- `.default` argument is the same as 'else' 
+- the `~` is the 'then'
+:::
+
+In case you see old code as this will still run
+
+```{r}
+#| code-line-numbers: "9"
+data |>
+  dplyr::mutate(
+    attendance_grouping = dplyr::case_when(
+      attendances < 5000 ~ "Less than 5,000",
+      attendances < 10000 ~ "5,000 to 9,999",
+      attendances < 15000 ~ "10,000 to 14,999",
+      attendances < 20000 ~ "15,000 to 19,999",
+      attendances < 25000 ~ "20,000 to 24,999",
+      TRUE ~ "Over 25,0000"
+    )
+  )
+```
+
+`TRUE` is the 'else' statement and you use `~` rather than `=`
+
+## Making mistakes
+
+::: {.incremental}
+- This case statement fails if we have a value of **exactly** 25,000
+- well not fail, just puts something in the wrong category
+:::
+
+```{r}
+data_to_show_problems <- data
+
+# change the first row to 25000
+data_to_show_problems$attendances[1] <- 25000
+
+data$attendances[1]
+data_to_show_problems$attendances[1]
+```
+
+## Default is "over 25k" when it is 25k
+
+```{r}
+data_to_show_problems <- data_to_show_problems |>
+  dplyr::mutate(
+    attendance_grouping = dplyr::case_when(
+      attendances < 5000 ~ "Less than 5,000",
+      attendances < 10000 ~ "5,000 to 9,999",
+      attendances < 15000 ~ "10,000 to 14,999",
+      attendances < 20000 ~ "15,000 to 19,999",
+      attendances < 25000 ~ "20,000 to 24,999",
+      .default = "Over 25,0000"
+    )
+  )
+
+data_to_show_problems
+```
+
+## Adding nulls
+
+```{r}
+data_to_show_problems$attendances[2] <- NA
+
+data_to_show_problems
+
+data_to_show_problems |>
+  dplyr::mutate(
+    attendance_grouping = dplyr::case_when(
+      attendances < 5000 ~ "Less than 5,000",
+      attendances < 10000 ~ "5,000 to 9,999",
+      attendances < 15000 ~ "10,000 to 14,999",
+      attendances < 20000 ~ "15,000 to 19,999",
+      attendances < 25000 ~ "20,000 to 24,999",
+      .default = "Over 25,0000"
+    )
+  )
+```
+
+## Better use of `.default` as a "catch"
+
+Use the true statement as an error catch
+
+```{r}
+data_to_show_problems |>
+  dplyr::mutate(
+    attendance_grouping = dplyr::case_when(
+      attendances < 5000 ~ "Less than 5,000",
+      attendances < 10000 ~ "5,000 to 9,999",
+      attendances < 15000 ~ "10,000 to 14,999",
+      attendances < 20000 ~ "15,000 to 19,999",
+      attendances < 25000 ~ "20,000 to 24,999",
+      attendances > 25000 ~ "Over 25,0000",
+      .default = "ERROR - does not compute"
+    )
+  )
+```
+
+## Over to you
+
+Add a column to determine:
+
+- **if** type `1` **then** half the attendances
+- **if** type `2` **then** triple the attendances
+- **if** type `other` **then** quadruple the attendances
+- **if** errors **then** a suitable error message
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+Remember the data types need to be the same
+:::
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 10,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - fixing the `.default` and 'ERROR - does not compute'
+
+
+```{r}
+data |>
+  dplyr::mutate(
+    attendance_multliper = dplyr::case_when(
+      type == "1" ~ attendances * 0.5,
+      type == "2" ~ attendances * 3,
+      type == "other" ~ attendances * 4,
+      .default = -9999
+    )
+  )
+```
+
+
+## End session

@@ -1,0 +1,232 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Pivotting"
+---
+
+## Pivotting
+
+::: {.incremental}
+- Often we want long data for charts and wide data for tables and often have to
+convert from one to another.
+- From human friendly reading across rows to machine friendly reading down columns.
+:::
+
+# pivot wider and longer
+
+Moving data from human friendly reading across a table of data to a computer
+friendly long table
+
+Let's convert data like this:
+
+```{r}
+tibble::tribble(
+  ~org, ~period, ~attendances,
+  "abd", "jan", 100,
+  "abd", "feb", 200,
+  "abd", "mar", 300
+)
+```
+
+to
+
+```{r}
+tibble::tribble(
+  ~org, ~jan, ~feb, ~mar,
+  "abd", 100, 200, 300
+)
+```
+
+## Prepare the data
+
+Start with filtering our data and selecting only a few columns
+
+```{r}
+library(NHSRdatasets)
+library(tidyr)
+
+data <- NHSRdatasets::ae_attendances
+
+data_long <- data |>
+  dplyr::filter(
+    org_code == "RQM",
+    type == "1",
+    period >= "2018-08-01"
+  ) |>
+  dplyr::select(
+    org_code, period,
+    attendances
+  )
+
+data_long
+```
+
+## Make it wider
+
+```{r}
+data_long |>
+  tidyr::pivot_wider(names_from = period, 
+                     values_from = attendances)
+
+```
+
+## Over to you
+
+Pivot wider and for breaches this time
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+HINT - remember to run the first bit and pull through the right data before
+you pivotfor bonus points make the process one pipe
+:::
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 9,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - pivot wider for breaches
+
+```{r}
+data |>
+  dplyr::filter(org_code == 'RQM', 
+                type == '1', 
+                period >= '2018-08-01') |>
+  dplyr::select(org_code, period, breaches) |>
+  tidyr::pivot_wider(names_from = period, 
+                     values_from = breaches)
+```
+
+# Expand with additional columns
+
+```{r}
+data_long <- data |>
+  dplyr::filter(
+    org_code == 'RF4',
+    #type == '1',                     # have not removed the type this time
+    period >= '2018-08-01'
+  ) |>
+  dplyr::select(org_code, 
+                period, 
+                attendances, 
+                type) # have included type back in
+
+data_long
+```
+
+Pivoting code is the same as before but type is now available as a column, unchanged
+
+```{r}
+data_long |>
+  tidyr::pivot_wider(names_from = period, 
+                     values_from = attendances)
+```
+
+# Adding more sites
+
+```{r}
+data_long <- data |>
+  dplyr::filter(
+    org_code %in% c('RQM', 'RJ1', 'RF4'),
+    # type == '1',                    # have not removed the type
+    period >= '2018-08-01'
+  ) |>
+  dplyr::select(org_code, 
+         period, 
+         attendances,
+         type) # have included type back in
+
+data_long
+```
+
+# Pivot multiple sites
+
+```{r}
+data_long |>
+  tidyr::pivot_wider(names_from = period, 
+                     values_from = attendances)
+
+```
+
+# Pivot with the breaches column added
+
+A version with breaches 
+
+```{r}
+data_long_breaches <- data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RF4'), 
+                period >= '2018-08-01') |>
+  dplyr::select(
+    org_code,
+    period,
+    attendances,
+    breaches, # have breaches type back in
+    type
+  )
+
+data_long_breaches
+```
+
+# Pivot wider with breaches with the same code
+
+Using the same code again but with breaches
+
+```{r}
+
+data_long_breaches |>
+  tidyr::pivot_wider(names_from = period, 
+                     values_from = attendances)
+
+```
+
+This doesn't look good - so many NAs
+
+# Pivot wider with breaches but change the code
+
+```{r}
+data_long_breaches |>
+  tidyr::pivot_wider(names_from = period, 
+                     values_from = c(attendances, breaches)
+                     )
+
+```
+
+In this example we now have automatically generated column names prefixed by 
+either `attendances` or `breaches`
+
+There are options to change how that is handled, but not going to go into
+that now.
+
+# Making wide data long
+
+Using a data frame we created in the last slides
+
+```{r}
+data_wide <- data_long |>
+  tidyr::pivot_wider(names_from = period, 
+                     values_from = attendances)
+
+data_wide
+```
+
+Make that wide
+
+```{r}
+data_wide |>
+  tidyr::pivot_longer(
+    cols = dplyr::where(is.numeric), # where selects all the numerical columns 
+    names_to = 'period',
+    values_to = 'attendances'
+  )
+```  
+  
+## End session

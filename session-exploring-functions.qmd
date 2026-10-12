@@ -1,0 +1,285 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Useful functions for exploring"
+---
+
+## Explore data frames
+
+Loading a dataset from NHSRdatasets
+
+```{r}
+data <- NHSRdatasets::ae_attendances
+
+# or
+
+data <- ae_attendances
+```
+
+## Looking at the column names
+
+Get a `character vector` of column names
+
+```{r}
+colnames(data)
+```
+
+Show the data type
+
+```{r}
+class(colnames(data))
+```
+
+Prove this is a vector
+
+```{r}
+is.vector(colnames(data))
+```
+
+What are [vectors again](https://intro-r-rstudio.nhsrcommunity.com/session-vectors.html#/title-slide)?
+
+## Looking at the data
+
+
+Using base R the `$` helps to select a column 
+
+In RStudio typing the data frame name then $ prompts with a drop down wizard
+
+```{r}
+data$type
+```
+
+
+Get a vector of unique data items in a variable
+
+```{r}
+unique(data$org_code)
+```
+
+## When is base R useful?
+
+::: {.incremental}
+- It's useful in packages where dependencies can cause long term maintenance issues.
+- That's similar to data analysis too as packages may move in and out of CRAN
+- Sometimes it's faster to run in analysis code
+- Sometimes it's faster to read
+- Some coding styles like `data.table` are much more similar to base R than dplyr so this can be a useful step to learning other packages
+
+:::
+
+## Finding specific data points
+
+Particular data points can be extracted and these are where `[ ]` square brackets are used.
+
+This gets the 4th entry  
+
+```{r}
+data$type[4]
+```
+
+We could also call the 4th to 10th entries  
+
+```{r}
+data$type[4:10]
+```
+
+## What does `Levels` mean?
+
+::: {.incremental}
+- The Levels for this data relates to it being a `factor` (categorical data) 
+- The levels are showing what else is available
+- A `factor` is a categorical variable (column of data) with a predefined list of allowed values
+:::
+
+## Over to you
+
+Can you find the data type for the columns `period`, `org_code` and `attendances`?
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 7,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - find data types
+
+```{r}
+class(data$period)
+class(data$org_code)
+class(data$attendances)
+```
+
+:::{.callout-caution collapse=false appearance='default' icon=true}
+## Python user warning!
+If you are a python coder (or will be in the future) it's worth knowing that R starts counting from 1 and not zero.
+:::
+
+## Other useful functions - distinct
+
+```{r}
+# remember this gets the unique values
+unique(data$org_code)
+
+# this counts them
+n_distinct(data$org_code)
+```
+
+
+## Statistics functions
+
+Get the range of a variable (useful for dates)
+
+```{r}
+range(data$period)
+```
+
+See structure of data to check data types (looks like the Environment panel in RStudio)
+
+```{r}
+str(data)
+```
+
+## Top and tail data
+
+See the first 5 rows of data
+
+```{r}
+head(data)
+```
+
+See the last 5 rows of data
+
+```{r}
+tail(data)
+```
+
+See the first 15 rows of data
+
+```{r}
+head(data, 15)
+```
+
+## Using dplyr to top and tail
+
+
+See the first 15 rows of data - but using dpylr
+
+```{r}
+dplyr::slice_head(data, n = 15)
+```
+
+See the first 15% of total rows of data (as it is currently with no ordering:
+
+```{r}
+dplyr::slice_head(data, prop = 0.15)
+```
+
+See the first 15% of total rows of data (grouped by type)
+
+```{r}
+dplyr::slice_head(data, prop = 0.15, by = type)
+```
+
+
+## Over to you
+
+Find the lowest 5 attendances for each org code
+
+Use the function `dplyr::slice_min` and don't forget the help documentation (F1 or search directly in the Help pane of RStudio)
+
+If that's quick to solve try the lowest 5 attendances for org code _and_ type.
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 8,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+
+## Answer for lowest 5 attendances
+
+For one category
+
+```{r}
+dplyr::slice_min(data,
+  n = 5,
+  order_by = attendances,
+  by = org_code
+)
+```
+
+For two categories
+
+```{r}
+dplyr::slice_min(data,
+  n = 5,
+  order_by = attendances,
+  by = c(org_code, type)
+)
+```
+
+## Looking at the structure of a data fram
+
+`summary()` is a super function that also can give great summaries of other
+objects - such as linear models
+
+```{r}
+summary(data)
+
+```
+
+## Quick counts by a column
+
+```{r}
+table(data$type)
+
+```
+
+or by 2 columns
+
+```{r}
+table(data$type, data$org_code)
+
+```
+
+You can do 3 columns but it starts to get silly how that is displayed!
+
+## Outputting data into code
+
+A handy little function
+
+```{r}
+smaller_data <- data |> 
+  dplyr::slice_head(n = 1) |> 
+  dplyr::select(period,
+                org_code
+                )
+
+dput(smaller_data)
+```
+
+:::{.callout-note collapse=false appearance='default' icon=true}
+## Factors are metadata
+Notice how all the org codes are listed but there is only 1 row for `RF4`
+:::
+
+## End session

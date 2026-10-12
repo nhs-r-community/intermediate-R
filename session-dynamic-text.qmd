@@ -1,0 +1,52 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Dynamic text"
+---
+
+## Combining text and variables for dynamic labels
+
+Say we want to create a sentence that says
+
+> The maximum number of attendances was 20000 
+
+(or whatever it is)
+
+we can create join a string together with the `paste0()` command
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+paste0('The maximum number of attendances was ', max(data$attendances))
+```
+
+## you can make longer strings and switch between text and non text with commas
+
+```{r}
+paste0(
+  'The maximum number of attendances was ',
+  max(data$attendances),
+  ' and the lowest was ',
+  min(data$attendances)
+)
+```
+
+## `glue` package
+
+The `glue` package has functions that are easier to use and to read than paste
+
+```{r}
+library(glue)
+
+max_attend <- max(data$attendances)
+min_attend <- min(data$attendances)
+
+glue(
+  'The maximum number of attendances was {max_attend} and the lowest was {min_attend}'
+)
+```
+
+This does the same with with considerably fewer brackets and commas
+
+## End session

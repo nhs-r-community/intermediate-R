@@ -1,0 +1,83 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Grouping by dates"
+---
+
+## Grouping by year and getting totals
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::filter(org_code == 'RQM', 
+                type == '1') |>
+  dplyr::group_by(
+    year_total = lubridate::floor_date(period, # note calling a new name to the grouped variable
+                                       'year')
+    ) |>
+  dplyr::summarise(
+    total_attendances = sum(attendances),
+    total_breaches = sum(breaches),
+    median_admissions = median(admissions, na.rm = TRUE)
+  )
+
+```
+
+## Calculating a financial year
+
+```{r}
+data |>
+  dplyr::filter(org_code == 'RQM', 
+                type == '1') |>
+  dplyr::mutate(
+    finance_year = ifelse(lubridate::month(period) >= 4, 
+                          lubridate::year(period) + 1, 
+                          lubridate::year(period)
+                          )
+    )
+
+```
+
+## Over to you
+
+Create a dataframe that contains:
+
+- a summary of sites RF4 and RQ3
+- and returns the maximum number of type 1 attendances
+- across those sites by financial year
+
+(yes that is a ridiculous question)
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 10,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - summarising by organisation and finance period
+
+```{r}
+data |>
+  dplyr::filter(org_code %in% c('RF4', 'RQ3'), type == '1') |>
+  dplyr::mutate(
+    finance_year = ifelse(lubridate::month(period) >= 4, 
+                          lubridate::year(period) + 1, 
+                          lubridate::year(period)
+                          )
+  ) |>
+  dplyr::summarise(max_attendances = max(attendances), .by = c(org_code, finance_year))
+```
+
+## End session

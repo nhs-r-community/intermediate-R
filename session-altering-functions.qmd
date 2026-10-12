@@ -1,0 +1,196 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Useful functions for altering data frames"
+---
+
+## Create a small data set
+
+From the previous session on exploring data
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+smaller_data <- data |>
+  dplyr::slice_head(n = 1) |>
+  dplyr::select(
+    period,
+    org_code
+  )
+
+# The data frame data
+smaller_data
+
+# The data frame with factor information
+dput(smaller_data)
+```
+
+## Removing `factor`
+
+To remove `factor` information we can create a new column (always a good idea in data analysis)
+
+```{r}
+add_to_data <- smaller_data |>
+  dplyr::mutate(`Organisational code` = factor(org_code))
+
+add_to_data
+```
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+Notice the code creates a `tibble` when we've previously seen `data frame` when using base R.
+:::
+
+## Checking the structure
+
+Let's check the structure again to see the difference between `Organisational code` and `org_code`
+
+```{r}
+str(add_to_data)
+```
+
+::: {.notes}
+The use of a space in `Organisational code` is deliberate as this will be renamed in the next slide.
+
+This replicates data as it often is written in Excel.
+
+This is equivalent to the use of square brackets in SQL.
+:::
+
+## Rename a column using dplyr
+
+Let's rename some more variables to something horrible:
+
+```{r}
+data_renamed <- data |>
+  dplyr::rename(
+    Breaches = breaches,
+    PERIOD = period,
+    ` type` = type
+  )
+
+data_renamed
+```
+
+## Little trick 
+
+With the `dplyr::select()` function where you can select and rename in the same code
+
+```{r}
+data |>
+  dplyr::select(
+    Breaches = breaches,
+    PERIOD = period,
+    ` type` = type
+  )
+```
+
+## A quicker function using the `janitor` package
+
+Notice it also cleans the leading whitespace which appears before the column name `type`
+
+```{r}
+janitor::clean_names(data)
+```
+
+## Over to you
+
+Have a quick try at renaming breaches to 'no of breaches' then put it back again
+
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 5,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - renaming columns
+
+```{r}
+data_with_rename <- data |>
+  dplyr::rename(`no of breaches` = breaches)
+
+data_with_rename
+
+colnames(data_with_rename)
+
+data_with_rename <- data_with_rename |>
+  dplyr::rename("breaches" = `no of breaches`)
+
+data_with_rename
+```
+
+## janitor package and Excel
+
+[`janitor`](https://cran.r-project.org/web/packages/janitor/vignettes/janitor.html) has many useful functions to work with Excel including
+
+::: {.incremental}
+- Convert excel dates to dates (if they do that weird numeric thing)
+- Find duplicate rows
+- Add quick totals
+:::
+
+## `select()` refresher
+
+From the [Introduction to R and R Studio course](https://intro-r-rstudio.nhsrcommunity.com/session-dplyr-showcase.html#/select) we learned 
+
+::: {.incremental}
+- selecting specific columns
+- deselecting columns
+- using the dplyr function `everything()`
+- using dplyr functions `starts_with()`, `ends_with()` and `contains()`
+:::
+
+## Selecting by data type
+
+It's possible to select columns by their data type using a base R function
+
+```{r}
+data |>
+  dplyr::select(where(is.numeric))
+```
+
+
+## Over to you
+
+- Select the data so that the first column is `admissions`
+- Then any column that is a factor 
+- Followed by all the remaining columns
+
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 7,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - renaming columns
+
+```{r}
+data |>
+  dplyr::select(admissions, 
+                where(is.factor), 
+                dplyr::everything())
+```
+
+## End session

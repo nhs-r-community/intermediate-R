@@ -1,0 +1,112 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Loops"
+---
+
+## What is a loop?
+
+::: {.incremental}
+- A loop is a element of that repeats a portion of code a desired number of
+times
+- Often with an iteration of values or variables
+- Let's look at a simple sequence `seq(1:10)`
+:::
+
+## Using the sequence in a loop
+
+This `seq(1:10)` gives us a simple sequence from one to ten
+
+If we want to print out the sequences with 5 added to each we can loop
+
+```{r}
+for (i in seq(1, 10)) {
+  # traditionally variables in a loop start at i
+  # (they just do!)
+  # what will happen is R will run the loop and for the first iteration
+  # i will be 1 and then 2 and then 3 and so on
+  i_plus_five <- i + 5
+  result <- paste0(i, ' plus 5 equals ', i_plus_five)
+  print(result)
+}
+
+```
+
+## A loop's scope
+
+::: {.incremental}
+- Again, like functions a for loop does have global "scope"
+- If you look `i_plus_five` exists in the global environment (top right of RStudio)
+- But only in it's last value as it was overwritten each time
+:::
+
+## Using a vector of data
+
+The real magic starts when we feed in a vector of data
+
+```{r}
+vector <- c('Bob', 'Pete', 'Mary')
+
+for (i in vector) {
+  result <- paste0('Hello ', i)
+  print(result)
+}
+```
+
+## Our function in a loop
+
+::: {.incremental}
+- So now we can look at running our function but within a loop
+- But we need to recall that a function can only return one result
+- So we would really like to collate all of those results into one object
+- And we can do this by utilising a list object
+- A list object is a super special multi dimensional thing that can contain a mix of variables, dataframes, plot objects and any combination thereof!
+:::
+
+## Lists need to be outlined
+
+::: {.incremental}
+- We can not create a list from within our loop, 
+- otherwise we would be creating it blank on each iteration
+- so lets make a blank list outside of our loop
+:::
+
+## Setting up the parts
+
+First create an empty list
+
+```{r}
+plot_list <- list()
+```
+
+Then the vector we will feed to our loop
+
+```{r}
+vector <- c('RQM', 'RJ1', 'RDD')
+```
+
+Then using the function built in the previous section:
+
+```{r}
+for (i in vector) {
+  plot_list[[i]] <- plot_site(i)
+}
+```
+
+## Looking at the list
+
+Let's call some of our plots from the list
+
+```{r}
+plot_list['RQM']
+
+plot_list['RJ1']
+
+```
+
+It is also possible to call the plot from its position in the list
+
+```{r}
+plot_list[1]
+```
+
+## End session

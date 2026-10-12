@@ -1,0 +1,167 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Strings"
+---
+
+## Text with numbers and letters
+
+What if we want to pull out just the numbers from those org_codes?
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::mutate(
+    org_code_number = readr::parse_number(
+      as.character(org_code),
+      na = c("NA", "Nothing")
+    )
+  )
+```
+
+This does throw up a warning as a number of `org_codes` do not have numbers in
+them it also is a little messy, but gives and idea of what can be done
+
+## Filtering data on single letters
+
+Maybe we want to filter our data to any org code that contains a 'R' or a 'P' 
+anywhere
+
+```{r}
+data |>
+  dplyr::filter(
+    stringr::str_detect(org_code, 'R') | # note the use of | to denote 'or'
+      stringr::str_detect(org_code, 'P')
+  )
+
+```
+
+## Over to you
+
+Can you return a dataframe with just the org_codes of those with a number over 50?
+
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 10,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - 
+
+```{r}
+data |>
+  dplyr::mutate(
+    org_code_number = readr::parse_number(
+      as.character(org_code),
+      na = c("NA", "Nothing")
+    )
+  ) |>
+  dplyr::filter(org_code_number > 50) |>
+  dplyr::select(org_code) |>
+  dplyr::distinct() # or unique() which is a base R function
+```
+
+## Shorten strings
+
+Sometimes we want to shorten strings we can do this by words or characters
+
+```{r}
+example <- 'This is an example of a long sentence that I would like to shorten as it is far too long'
+```
+
+## Shortening using characters
+
+```{r}
+substr(example, start = 1, stop = 15)
+```
+
+# Shorten using whole words
+
+```{r}
+stringr::word(example, 
+              start = 1, 
+              end = 4, 
+              sep = stringr::fixed(' ')) # note uses end and not stop
+```
+
+
+## Removing words - like for hospital names
+
+Useful for handling really long hospital names and making them readable
+
+```{r}
+long_hospital_name <- 'Boggins University HosPital NHS Trust'
+```
+
+The capital P is deliberate!
+
+## Change to just 'Boggins HosPital'
+
+```{r}
+library(tm)
+# tm is a text mining library but has some nice text features
+
+short_hospital_name <- tm::removeWords(
+  long_hospital_name,
+  c('University', 'NHS', 'Trust')
+)
+
+short_hospital_name
+```
+
+Close but now we have odd spaces between our words and at the end
+
+## Editing out whitespace
+
+Removes spaces from the start and and of the string as well as the internal spaces
+
+```{r}
+squished_short_name <- stringr::str_squish(short_hospital_name)
+
+squished_short_name
+```
+
+## Over to you
+
+We still have an annoying rogue capital P in our hospital use your Google 
+search skills to find a `str_` function to fix it
+
+We want 'Boggins Hospital'
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 10,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - fixing the capital inside a lower case word
+
+```{r}
+stringr::str_to_sentence(squished_short_name)
+
+```
+
+## End session

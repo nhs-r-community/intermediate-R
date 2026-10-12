@@ -1,0 +1,370 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Functions"
+---
+
+## Introduction to functions
+
+::: {.incremental}
+- Say we want to do something many times
+- We could just copy and paste our code, but that gets really dull really quickly
+- it also means if we update something, we have to update it in all the duplicate instances of that code
+- this gets super dull super quickly
+:::
+
+## Solving that problem 
+
+So what we can do is set up a function do repeat a number of steps
+
+Starting simply:
+
+```{r}
+x <- 5
+y <- 10
+z <- 15
+```
+
+We want to triple each of our variables and then
+
+We could do x*3, y*3, z*3
+
+## Long hand
+
+```{r}
+x_mult <- x * 3
+```
+
+But we would have to repeat the code if we wanted to check `y` & `z` and also change all the variables
+
+## Building a function
+
+::: {.incremental}
+- we start with naming our function
+- we then do all the calculations
+- we then return the result
+:::
+
+:::{.callout-warning collapse=false appearance='default' icon=true}
+A function can only return one result, but later we will be clever in how this 'one result' is built
+:::
+
+## The code
+
+```{r}
+times_three <- function(input) {
+  return(input * 3)
+}
+```
+
+We can now test it with our variables
+
+```{r}
+times_three(x)
+times_three(y)
+```
+
+## Using any number
+
+We aren't restricted to the pre-determined vectors and can just use a number:
+
+```{r}
+times_three(7)
+```
+
+## Multiple arguments/parameters
+
+::: {.incremental}
+- Although a function can only return one object
+- You can add more than one variable into a function separated by commas
+:::
+
+
+```{r}
+x_times_y <- function(x, y) {
+  result <- x * y
+  b <- 150
+  return(print(paste0('The answer is ', result, ' and b is ', b)))
+}
+
+var <- x_times_y(x, y)
+
+```
+
+## What a function returns
+
+::: {.incremental}
+- A function will only return one thing.
+- You do not have to specify what it returns with a return function
+- R will by default return the last thing in a function
+:::
+
+```{r}
+x_times_y_no_return <- function(x, y) {
+  result <- x * y
+  print(paste0('The answer is ', result))
+}
+
+x_times_y_no_return(5, 4)
+
+```
+
+## A function's sphere of influence
+
+::: {.incremental}
+- What happens in a function's "scope" between `{}` is not in the global environment
+- For instance the variable 'result' only exists within the scope of the function
+- A function's scope can not affect outside of the function
+:::
+
+```{r}
+test <- 'monkey'
+
+x_times_y_scope <- function(x, y) {
+  result <- x * y
+  test <- 'moo'
+  print(paste0('The answer is ', test))
+}
+
+```
+
+# Guess what will happen?
+
+Before we run this what will happen to the variable 'test'?
+
+```{r}
+x_times_y_scope(5, 4)
+```
+
+## Multiple steps in a function
+
+```{r}
+x_times_y_plus_ten_date <- function(x, y) {
+  result <- x * y
+  day_of_month <- lubridate::day(Sys.Date())
+  dplyr::if_else(day_of_month > 15, result + 10, result)
+}
+
+```
+
+Without running it please type into the chat the result of the function
+
+```{r}
+x_times_y_plus_ten_date(3, 10)
+```
+
+## Functions can be long and/or complicated
+
+::: {.incremental}
+- Functions get pretty convoluted pretty quickly and can be hard to read
+- which is why it is good practice to write doc strings for functions
+- Uses Roxygen and the shortcut Ctrl + Shift + Alt + R for the template
+:::
+
+## Function documentation
+
+```{r}
+
+  # This function multiplies two numbers (x and y) and adds 10 to the result
+  # if the current day of the month is greater than 15. Otherwise, it simply
+  # returns the product of x and y.
+  #
+  # @param x [numeric] The first number to be multiplied.
+  # @param y [numeric] The second number to be multiplied.
+  #
+  # @return The product of x and y, with 10 added if the current day is past
+  # the 15th.
+  #
+  # @examples
+  # Example 1: Today is the 10th of the month
+  # x <- 5
+  # y <- 2
+  # result <- x_times_y_plus_ten_date(x, y)
+  # print(result) # Output: 10
+  #
+  # Example 2: Today is the 20th of the month
+  # x <- 3
+  # y <- 4
+  # result <- x_times_y_plus_ten_date(x, y)
+  # print(result) # Output: 22
+x_times_y_plus_ten_date <- function(x, y) {
+  result <- x * y
+  day_of_month <- lubridate::day(Sys.Date())
+  dplyr::if_else(day_of_month > 15, result + 10, result)
+}
+
+```
+
+## Over to you
+
+- Tweak the previous function so that instead of "times the first two inputs and add 10 to the result based on the day in the month" it adds a number you specify (another variable)
+- For bonus points assign your result to a variable
+
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 7,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - Altering a function
+
+```{r}
+x_times_y_plus_ten_date <- function(x, y, add) {
+  result <- x * y
+  day_of_month <- lubridate::day(Sys.Date())
+  dplyr::if_else(day_of_month > 15, result + add, result)
+}
+
+variable <- x_times_y_plus_ten_date(4, 1, 15)
+variable
+```
+
+
+## Applying data to functions
+
+We can apply our made up new functions to a dataframe we first create:
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data_fun <- data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RDD'), type == '1') |>
+  dplyr::select(-breaches)
+
+```
+
+## Using a function to add data to a column
+
+```{r}
+#| code-line-numbers: "4"
+data_fun |>
+  dplyr::rowwise() |>
+  dplyr::mutate(
+    attend_times_admit_maybe_plus_ten = x_times_y_plus_ten_date(
+      attendances,
+      admissions,
+      10
+    )
+  )
+
+```
+
+This is a bit of a silly example but shows what potentially can be done.
+
+This can be great for calculating rates, for example, per 10,000
+
+## Creating a function to plot SPC
+
+We can write a lot of code that will be reused for multiple sites into one function:
+
+```{r}
+plot_site <- function(site) {
+  # we now want to create a for each attendance type
+  data_spc <- data |>
+    dplyr::filter(org_code == site) # note this is where we are using our 'site'
+  # variable
+
+  # turn our ptd_spc into an object
+  plot_spc <- data_spc |>
+    NHSRplotthedots::ptd_spc(
+      value_field = attendances,
+      date_field = period,
+      improvement_direction = 'decrease',
+      facet_field = type
+    )
+  
+  # feed that object into ptd_create_ggplot
+
+  return(
+    plot_spc |>
+      NHSRplotthedots::ptd_create_ggplot(
+        fixed_y_axis_multiple = FALSE,
+        x_axis_date_format = "%b %y",
+        x_axis_breaks = "2 months"
+      )
+  )
+}
+
+```
+
+## Apply the plot function to code
+
+```{r}
+plot_site(site ='RJ1')
+
+plot_site(site = 'RDD')
+
+```
+
+:::{.callout-wardning collapse=false appearance='default' icon=true}
+- This function is bad practice as it relies on `data` existing already
+- If this data changed name or needed to be something else the function would break
+:::
+
+## Adding another argument for data
+
+This has a new argument but also pre-set for `RJ1` and a df called `data`
+
+```{r}
+#| code-line-numbers: "2"
+plot_site <- function(site = 'RJ1', 
+                      df = data) {
+  # this is where we set a default
+
+  # we now want to create a for each attendance type
+  data_spc <- df |> # note this is where pulling in our data
+    dplyr::filter(org_code == site)
+
+  # turn our ptd_spc into an object
+  plot_spc <- data_spc |>
+    NHSRplotthedots::ptd_spc(
+      value_field = attendances,
+      date_field = period,
+      improvement_direction = 'decrease',
+      facet_field = type
+    )
+
+  # feed that object into ptd_create_ggplot
+
+  return(
+    plot_spc |>
+      NHSRplotthedots::ptd_create_ggplot(
+        fixed_y_axis_multiple = FALSE,
+        x_axis_date_format = "%b %y",
+        x_axis_breaks = "2 months"
+      )
+  )
+}
+
+```
+
+## No changes to the use
+
+This works just the same as the data is still referred to, but in the argument
+
+```{r}
+plot_site()
+```
+
+But, if needed we could change the data source and site to something else:
+
+```{r}
+new_data <- data
+
+plot_site(df = new_data,
+          site = "RDU")
+```
+
+## End session

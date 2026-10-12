@@ -1,0 +1,20 @@
+project:
+  title: "intermediate-r"
+  render: 
+    - "*.qmd"
+    - "!*.md"
+author: "Zoë Turner"
+format:
+  revealjs:
+    theme: [default, nhsr-quarto.scss]
+    logo: https://raw.githubusercontent.com/nhs-r-community/assets/main/logo/nhsr-logo.svg
+    code-link: true
+    css: nhsr-quarto.scss
+title-slide-attributes: 
+  data-background-color: "#43464B"
+embed-resources: true
+execute:
+  echo: true
+  eval: false
+editor_options: 
+  chunk_output_type: console

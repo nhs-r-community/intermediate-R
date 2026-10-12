@@ -1,0 +1,100 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Fancy filtering"
+---
+
+## Search for part of words
+
+Search for the letter R anywhere in the column (note the case sensitivity)
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::filter(stringr::str_detect(org_code, "R"))
+
+```
+
+## Filters with grouped data
+
+As with `summarise()` and `mutate()` we can group within the function `filter()`
+
+```{r}
+data |>
+  dplyr::filter(org_code %in% c("RQQ", "NAX")) |> 
+  dplyr::arrange(period)
+```
+
+Adding the group with `.by()`
+
+```{r}
+data |>
+  dplyr::filter(org_code %in% c("RQQ", "NAX")) |> 
+  dplyr::arrange(period) |> 
+  dplyr::filter(period == max(period), .by = org_code) 
+
+```
+
+## Filtering using `AND`
+
+Find type 1 `AND` attendances over 10,000
+
+```{r}
+data |>
+  dplyr::filter(type == '1', 
+                attendances > 10000)
+
+```
+
+## Filtering using `OR`
+
+Find type 1 `OR` attendances over 10,000
+
+```{r}
+data |>
+  dplyr::filter(
+    type == '1' |
+      attendances > 10000
+  )
+
+```
+
+## Over to you
+
+- Filter by type 1 `attendances` 
+- Count org_code (for a bonus point put this in order of submissions)
+- Filter by at least 24 submissions per `org_code`
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+- Help can be found for any function by typing `?` before it on the console or putting the cursor into it and selecting F1
+:::
+
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 10,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - using count
+
+```{r}
+data |>
+  dplyr::filter(type == '1') |>
+  dplyr::count(org_code, sort = TRUE) |>
+  dplyr::filter(n >= 24) # n is the default name for the column
+```
+
+## End session

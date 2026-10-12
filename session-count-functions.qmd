@@ -1,0 +1,66 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Functions to help with counting"
+---
+
+## Counting using summarise
+
+You might be familiar with 
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |> 
+  dplyr::summarise(count_types = dplyr::n(), .by = type)
+
+```
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+This uses the `.by()` argument is is _temporary grouping_ and is dropped after running the code. 
+
+Using `group_by()` is [persistent grouping](https://intro-r-rstudio.nhsrcommunity.com/session-dplyr-wrangling.html#/group_by---temporary-grouping).
+:::
+
+
+## A specific function to count
+
+Simply use a function called count to count:
+
+```{r}
+data |> 
+  dplyr::count(type)
+```
+
+This is similar to `summarise()` which condenses the data frame to the count columns.
+
+## Adding a total column
+
+But you might be familiar with `mutate()` and want to adds the column to the data frame:
+
+```{r}
+data |>
+  dplyr::mutate(count = dplyr::n(), .by = type)
+```
+
+## Quicker way to add total column
+
+The column name defaults to n for `number`
+
+```{r}
+data |>
+  dplyr::add_count(type)
+
+```
+
+The function has additional arguments like name and sort
+
+```{r}
+data |>
+  dplyr::add_count(type, 
+                   name = "total_type",
+                   sort = TRUE)
+```
+
+## End session

@@ -1,0 +1,99 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Subtotals"
+---
+
+## `group` and `mutate` to make sub totals
+
+::: {.incremental}
+- The `summarise()` function changes the entire data frame and gives only the statistics
+in the function.
+- What if you wanted to add it to an existing data frame?
+:::
+
+## Total and Percentages by month and org
+
+Let's create new columns with totals and percentages by each period and org_code
+
+Long hand with `dplyr`
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::mutate(
+    total_attend = sum(attendances),
+    perc_attend = (attendances / total_attend) * 100,
+    .by = c(org_code, period)
+  )
+```
+
+## And using the package `janitor`
+
+Using a small subset so we can see the bottom of the data frame
+
+```{r}
+data |> 
+  dplyr::slice_head(n = 5) |> 
+  janitor::adorn_totals(where = "row")
+
+
+data |> 
+  dplyr::slice_head(n = 5) |> 
+  janitor::adorn_totals(where = "col",
+                        name = "total_attend")
+
+```
+
+## Over to you
+
+The dplyr code can create a pretty long decimal as a percentage
+
+```{r}
+data |>
+  dplyr::mutate(
+    total_attend = sum(attendances),
+    perc_attend = (attendances / total_attend) * 100,
+    .by = c(org_code, period)
+  )
+```
+
+Can you round it to 1 decimal place using the function `round()`?
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+- Be very mindful of your commas and brackets!
+- There are settings in Tools > Global Options... > Code > Display related to brackets
+:::
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 7,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - adding `round()` to restrict to 1 decimal place
+
+```{r}
+data |>
+  dplyr::mutate(
+    total_attend = sum(attendances),
+    perc_attend = round((attendances / total_attend) * 100, 1),
+    .by = c(org_code, period)
+  )
+
+```
+
+
+## End session

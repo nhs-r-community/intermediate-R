@@ -1,0 +1,186 @@
+---
+title: "Intermediate R"
+subtitle: "Session - statistical process control"
+---
+
+## Plot the dots - SPC charts
+
+```{r}
+library(NHSRdatasets)
+library(NHSRplotthedots)
+
+data <- NHSRdatasets::ae_attendances
+
+data_spc <- data |>
+  dplyr::filter(org_code == 'RVR', type == '1')
+
+data_spc |>
+  NHSRplotthedots::ptd_spc(value_field = attendances, 
+                           date_field = period)
+```
+
+
+## Over to you
+
+- Add in a target of 17,500
+- Show improvement as a reduction
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 7,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - adding target and improvement to SPC
+
+```{r}
+data_spc |>
+  NHSRplotthedots::ptd_spc(
+    value_field = attendances,
+    date_field = period,
+    target = 17500,
+    improvement_direction = 'decrease'
+  )
+```
+
+## Facetting an SPC
+
+We now want to create a chart for each attendance type
+
+```{r}
+data_spc <- data |>
+  dplyr::filter(org_code == 'RVR')
+
+data_spc |>
+  NHSRplotthedots::ptd_spc(
+    value_field = attendances,
+    date_field = period,
+    improvement_direction = 'decrease',
+    facet_field = type
+  )
+```
+
+
+## Improving the chart
+
+Not bad but looks a bit clumpy and we need to tweak a few things to make this 
+a pretty `ggplot`
+
+First turn our ptd_spc into an object:
+
+```{r}
+plot_spc <- data_spc |>
+  NHSRplotthedots::ptd_spc(
+    value_field = attendances,
+    date_field = period,
+    improvement_direction = 'decrease',
+    facet_field = type
+  )
+
+```
+
+## Feed that object into ptd_create_ggplot
+
+```{r}
+plot_spc |>
+  NHSRplotthedots::ptd_create_ggplot(
+    fixed_y_axis_multiple = FALSE,
+    x_axis_date_format = "%b %y",
+    x_axis_breaks = "2 months"
+  )
+
+```
+
+
+## Over to you - prepare data
+
+- Create a faceted plot for type 1 attendances RQM, RJ1 and RDD
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+This will require creating a data object followed by an SPC plot object
+:::
+
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 5,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - create dataset
+
+```{r}
+data_spc <- data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RDD'), 
+         type == '1')
+
+plot_spc <- data_spc |>
+  NHSRplotthedots::ptd_spc(
+    value_field = attendances,
+    date_field = period,
+    improvement_direction = 'decrease',
+    facet_field = org_code
+  )
+
+```
+
+## Over to you - improve the plot SPC
+
+- Change the point size to look nicer
+- Change the x axis label to date rather than period
+- Make any other changes you feel would be useful to describe chart
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 7,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - alter the SPC plot
+
+```{r}
+plot_spc |>
+  NHSRplotthedots::ptd_create_ggplot(
+    fixed_y_axis_multiple = FALSE,
+    x_axis_date_format = "%b %y",
+    x_axis_breaks = "2 months",
+    point_size = 2,
+    main_title = 'Prettier SPC plot',
+    x_axis_label = 'Date',
+    icons_position = "top left",
+    icons_size = 12
+  )
+```
+
+
+## End session

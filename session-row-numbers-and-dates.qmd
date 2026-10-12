@@ -1,0 +1,148 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Row numbers and dates"
+---
+
+## Adding a row number
+
+::: {.incremental}
+- Very useful for calculating times between things
+- or identifying things like referral time to second contact and so on
+:::
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RDD')) |>
+  dplyr::arrange(org_code, type, period) |>
+  dplyr::mutate(row_number = dplyr::row_number())
+```
+
+## Row number per org_code
+
+```{r}
+dat <- data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RDD')) |>
+  dplyr::arrange(org_code, type, period) |>
+  dplyr::mutate(row_number = dplyr::row_number(), .by = c(org_code, type))
+
+View(dat)
+```
+
+## Row number per date (dense rank)
+
+```{r}
+data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RDD')) |>
+  dplyr::arrange(period) |>
+  dplyr::mutate(row_number = dplyr::dense_rank(period))
+
+```
+
+## Reverse dates
+
+Whilst it's possible to put a '-' in front of the variable if it's an integer
+
+```{r}
+data |>
+  dplyr::arrange(-admissions)
+```
+
+This doesn't work with dates:
+
+```{r}
+data |>
+  dplyr::arrange(-period)
+```
+
+## Reverse ordering dates uses a dplyr function
+
+```{r}
+data |>
+  dplyr::arrange(dplyr::desc(period))
+
+# compare to the default ascending order
+
+data |>
+  dplyr::arrange(period)
+```
+
+## Row number per date - jump missing (rank)
+
+```{r}
+dat <- data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RDD')) |>
+  dplyr::arrange(period) |>
+  dplyr::mutate(rank_row_number = dplyr::min_rank(period)) |>
+  dplyr::mutate(row_number = dplyr::row_number(period))
+
+View(dat)
+```
+
+## Using `between()`
+
+Now lets remove 2018 by using the first and last date
+
+```{r}
+dat <- data |>
+  dplyr::filter(org_code %in% c('RQM', 'RJ1', 'RDD')) |>
+  dplyr::filter(!dplyr::between(
+      period, # note the ! in front for the between to convert it
+      # into a not between
+      as.Date('2018-01-01'),
+      as.Date('2018-12-31')
+    )
+  ) |>
+  dplyr::arrange(period)
+
+View(dat)
+```
+
+## Over to you
+
+Adjust the code above to:
+
+- remove the year 2017 and 
+- return only the first 3 rows 
+- for only type 1 
+- for each organisation
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 10,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - adjusting code
+
+```{r}
+data |>
+  dplyr::filter(
+    org_code %in% c('RQM', 'RJ1', 'RDD'),
+    !dplyr::between(
+      period, # note the ! in front for the between to convert
+      # it into a not between
+      as.Date('2017-01-01'),
+      as.Date('2017-12-31')
+    )
+  ) |>
+  dplyr::arrange(org_code, type, period) |>
+  dplyr::mutate(row_num = dplyr::row_number(), .by = org_code, type) |>
+  dplyr::filter(row_num <= 3)
+```
+
+
+## End session

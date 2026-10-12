@@ -1,0 +1,31 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Rowwise"
+---
+
+## Rowwise operations
+
+In essence `rowwise` treats each each row as its own group
+
+In this example the highest number between breaches and admissions appears in `max_col`
+
+```{r}
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::filter(org_code == "RF4",
+                type == 1) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(max_col = max(admissions, breaches, na.rm = TRUE)) |>
+  dplyr::ungroup()
+
+```
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+`rowwise` is a grouping function and needs to be ungrouped
+:::
+
+
+## End session

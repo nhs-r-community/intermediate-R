@@ -1,0 +1,46 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Introduction"
+execute: 
+  echo: false
+---
+
+Special thanks to Simon Wellesley-Miller who originally wrote this course as a script for NHS-R Community
+
+## Course Overview
+
+::: incremental
+- a lot of intermediate data wrangling
+- this course assumes a basic level of knowledge of R and dpylr
+- it is expected that you are at least familiar with the contents of the NHS-R Introduction to R and R Studio course
+- in this tutorial we will be using modern `|>` pipes, these have most of the functionality of the old pipes `%>%` if you prefer to use those
+:::
+
+## Agenda - part 1 3.5 hours
+
+Chapter overview
+
+- Loading libraries
+- Exploring functions
+- Altering functions
+- Alternative joins
+- Count functions
+- Fancy filtering
+- Conditionals
+- Subtotals (using group and mutate)
+
+## Agenda - part 2 3.5 hours
+
+- Rowwise
+- Pivotting
+- Rolling functions
+- Row numbers and dates
+- Grouping by dates
+- Strings
+- Factors
+- Dynamic text
+- SPC
+- Functions
+- Loops
+
+## End session

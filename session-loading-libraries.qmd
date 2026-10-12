@@ -1,0 +1,51 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Loading libraries"
+---
+
+## Loading libraries
+
+Although you are familiar with loading a library we can load multiple libraries:
+
+```{r}
+# Specify required packages
+my_packages <- c("tidyverse", "NHSRdatasets", "NHSRplotthedots", "pacman", "janitor")
+
+```
+
+## Find what's already loaded
+
+It's possible to load libraries you already have but if you want to check for what is not already installed this base R returns a vector of what's missing:
+
+```{r}
+# Extract not installed packages
+not_installed <- my_packages[
+  !(my_packages %in%
+    installed.packages()[, "Package"])
+]
+```
+
+
+## Only load if missing
+
+In R, within an `if()` statement 0 is treated as `FALSE` whilst any non-zero number is treated as `TRUE`
+
+```{r}
+# Install not installed packages
+if (length(not_installed)) {
+  install.packages(not_installed)
+}
+
+```
+
+## `pacman` package
+
+Combines all these steps into one function `p_load`.
+
+Put the cursor on the function word `p_load` and press F1 to get more details:
+
+```{r}
+pacman::p_load(char = my_packages)
+```
+
+## End session

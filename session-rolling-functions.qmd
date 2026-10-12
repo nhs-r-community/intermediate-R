@@ -1,0 +1,83 @@
+---
+title: "Intermediate R"
+subtitle: "Session - Rolling functions"
+---
+
+## Rolling mean of attendances
+
+Say we wanted a 6 month rolling mean of attendances by each of the sites in
+our data...
+
+```{r}
+# zoo has a lovely function for rolling windows
+library(zoo)
+library(NHSRdatasets)
+
+data <- NHSRdatasets::ae_attendances
+
+data |>
+  dplyr::filter(org_code %in% c("RQM", "RJ1", "RDD")) |>
+  dplyr::arrange(
+    org_code,
+    type,
+    period
+  ) |>
+  dplyr::mutate(
+    rolling = zoo::rollapply(
+      data = attendances,
+      width = 6,
+      FUN = mean,
+      align = "right",
+      fill = NA
+    ),
+    .by = c(org_code, type)
+  )
+```
+
+## Over to you
+
+- See if you can change the window to 3 months
+- Then add an additional new column with a `median` over 3 months
+- See if you can calculate it on the middle time period and 
+- Replace any blanks with 9999
+
+:::{.callout-tip collapse=false appearance='default' icon=true}
+HINT - read your error messages
+:::
+
+```{r}
+#| eval: true
+#| echo: false
+countdown::countdown(
+  minutes = 10,
+  color_border = "#005EB8",
+  color_text = "#005EB8",
+  color_running_text = "white",
+  color_running_background = "#005EB8",
+  color_finished_text = "#005EB8",
+  color_finished_background = "white",
+  margin = "0.9em",
+  font_size = "2em"
+)
+```
+
+## Answer - altering the zoo rolling function
+
+```{r}
+data |>
+  dplyr::filter(org_code %in% c("RQM", "RJ1", "RDD")) |>
+  dplyr::arrange(org_code, type, period) |>
+  dplyr::mutate(
+    rolling = zoo::rollapply(
+      data = attendances,
+      width = 3,
+      FUN = median,
+      align = "center",
+      fill = 9999
+    ),
+    .by = c(org_code, type)
+  )
+```
+
+
+## End session
