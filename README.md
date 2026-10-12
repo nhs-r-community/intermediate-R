@@ -21,3 +21,5 @@ This is a slide version of the [Intermediate R Training](https://github.com/nhs-
 - [SPC](https://nhs-r-community.github.io/intermediate-R/session-spc.html)
 - [Functions](https://nhs-r-community.github.io/intermediate-R/session-functions.html)
 - [Loops](https://nhs-r-community.github.io/intermediate-R/session-loops.html)
+
+[Break slide](https://nhs-r-community.github.io/intermediate-R/session-break-slide.html)
