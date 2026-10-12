@@ -1,0 +1,23 @@
+## Intermediate R (slides)
+
+This is a slide version of the [Intermediate R Training](https://github.com/nhs-r-community/intermediate_R_training) created originally in a script format.
+
+- [Loading libraries](https://nhs-r-community.github.io/intermediate-R/session-loading-libraries.html#/title-slide)
+- [Exploring functions](https://nhs-r-community.github.io/intermediate-R/session-exploring-functions.html#/title-slide)
+- [Altering functions](https://nhs-r-community.github.io/intermediate-R/session-altering-functions.html)
+- [Alternative joins](https://nhs-r-community.github.io/intermediate-R/session-alternative-joins.html)
+- [Count functions](https://nhs-r-community.github.io/intermediate-R/session-count-functions.html)
+- [Fancy filtering](https://nhs-r-community.github.io/intermediate-R/session-fancy-filtering.html)
+- [Conditionals](https://nhs-r-community.github.io/intermediate-R/session-conditionals.html)
+- [Subtotals](https://nhs-r-community.github.io/intermediate-R/session-subtotals.html) (using group and mutate)
+- [Rowwise](https://nhs-r-community.github.io/intermediate-R/session-rowwise.html)
+- [Pivotting](https://nhs-r-community.github.io/intermediate-R/session-pivotting.html)
+- [Rolling functions](https://nhs-r-community.github.io/intermediate-R/session-rolling-functions.html)
+- [Row numbers and dates](https://nhs-r-community.github.io/intermediate-R/session-row-numbers-and-dates.html)
+- [Grouping by dates](https://nhs-r-community.github.io/intermediate-R/session-grouping-dates.html)
+- [Strings](https://nhs-r-community.github.io/intermediate-R/session-strings.html)
+- [Factors](https://nhs-r-community.github.io/intermediate-R/session-factors.html)
+- [Dynamic text](https://nhs-r-community.github.io/intermediate-R/session-dynamic-text.html)
+- [SPC](https://nhs-r-community.github.io/intermediate-R/session-spc.html)
+- [Functions](https://nhs-r-community.github.io/intermediate-R/session-functions.html)
+- [Loops](https://nhs-r-community.github.io/intermediate-R/session-loops.html)
